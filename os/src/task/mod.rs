@@ -144,7 +144,7 @@ impl TaskManager {
         }
     }
 
-    fn syscall_trace(&self, syscall_id: usize) {
+    fn count_syscall(&self, syscall_id: usize) {
         let mut inner = self.inner.exclusive_access();
         let current = inner.current_task;
         inner.tasks[current].task_info.syscall_times[syscall_id % MAX_SYSCALL_NUM] += 1;
@@ -153,9 +153,9 @@ impl TaskManager {
 
     fn fetch_task_info(&self) -> TaskInfo {
         let mut inner = self.inner.exclusive_access();
-        let current = inner.current_task;
         let time = get_time_ms();
-
+        let current = inner.current_task;
+        
         inner.tasks[current].task_info.time += time - inner.tasks[current].last_time;
         inner.tasks[current].last_time = time;
         inner.tasks[current].task_info
@@ -196,8 +196,8 @@ pub fn exit_current_and_run_next() {
 }
 
 /// syscall trace
-pub fn trace_syscall(syscall_id: usize) {
-    TASK_MANAGER.syscall_trace(syscall_id);
+pub fn syscall_count(syscall_id: usize) {
+    TASK_MANAGER.count_syscall(syscall_id);
 }
 
 /// Fetch current task information
